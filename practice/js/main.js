@@ -42,11 +42,28 @@ var VehicleView = Backbone.View.extend({
 	}
 });
 
+var NewVehicleView = Backbone.View.extend({
+	
+	events: {
+		"click .add" : "addCar",
+	},
+
+	addCar: function(){
+		text = document.getElementById("text").value
+		console.log("Add car", text);
+		vehicle = new Vehicle({ registrationNumber: text });
+	},
+
+	render: function(){
+		this.$el.html("<textarea id=text></textarea>" + "<button class='add'>Add</button>")
+	}
+});
+
 var VehiclesView = Backbone.View.extend({
 	tagName: "ul",
 	
 	initialize: function(){
-		this.collection.on("remove", this.onVehicleRemoved, this);
+		this.collection.on("remove", this.onVehicleRemoved, this.$el);
 	},
 
 	events: {
@@ -80,6 +97,10 @@ var vehicles = new Vehicles([
 $(function() {
 	
 //PROJECT#3
+
+	var newVehicleView = new NewVehicleView({
+		el: "#new"});
+	newVehicleView.render();
 
 	var vehiclesView = new VehiclesView({ el: "#cars", collection: vehicles});
 	vehiclesView.render();
