@@ -44,6 +44,10 @@ var VehicleView = Backbone.View.extend({
 
 var NewVehicleView = Backbone.View.extend({
 	
+	initialize: function(options){
+		this.bus = options.bus;
+	},
+
 	events: {
 		"click .add" : "addCar",
 	},
@@ -52,6 +56,8 @@ var NewVehicleView = Backbone.View.extend({
 		text = document.getElementById("text").value
 		console.log("Add car", text);
 		vehicle = new Vehicle({ registrationNumber: text });
+		this.bus.trigger("carAdded", vehicle);
+
 	},
 
 	render: function(){
@@ -62,8 +68,14 @@ var NewVehicleView = Backbone.View.extend({
 var VehiclesView = Backbone.View.extend({
 	tagName: "ul",
 	
-	initialize: function(){
-		this.collection.on("remove", this.onVehicleRemoved, this.$el);
+	initialize: function(options){
+		this.bus = options.bus;
+		this.bus.on("carAdded", this.onCarAdded, this);
+	},
+
+	onCarAdded: function(car){
+		this.model = car;
+		this.render();
 	},
 
 	events: {
@@ -98,11 +110,17 @@ $(function() {
 	
 //PROJECT#3
 
+	var bus = _.extend({}, Backbone.Events);
+
 	var newVehicleView = new NewVehicleView({
-		el: "#new"});
+		el: "#new",
+		bus: bus
+	});
 	newVehicleView.render();
 
-	var vehiclesView = new VehiclesView({ el: "#cars", collection: vehicles});
+	var vehiclesView = new VehiclesView({ el: "#cars", collection: vehicles, 
+		bus: bus
+	});
 	vehiclesView.render();
 
 //PROJECT#2
